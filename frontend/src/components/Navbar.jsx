@@ -15,7 +15,9 @@ export default function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-    navigate('/login');
+        setUser(null);
+    navigate('/login', { replace: true });
+    window.location.href = '/login';
   };
 
   if (!user) return null;

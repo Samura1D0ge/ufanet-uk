@@ -7,20 +7,18 @@ export default function WorkerTickets() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Получаем данные текущего пользователя
     client.get('/auth/me/')
       .then(({ data }) => {
         setUser(data);
-        // Загружаем заявки, назначенные этому работнику
         return client.get('/tickets/');
       })
       .then(({ data }) => {
         const allTickets = data.results || data;
-        // Фильтруем только назначенные этому работнику
         const myTickets = allTickets.filter(t => 
           t.assigned_to === user.id
         );
         setTickets(myTickets);
+        setLoading(false);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -50,7 +48,7 @@ export default function WorkerTickets() {
     <div style={{ padding: '2rem', maxWidth: '900px', margin: '0 auto' }}>
       <h1>Мои заявки</h1>
       <p style={{ color: '#666', marginBottom: '2rem' }}>
-        Специальность: {user?.role === 'PLUMBER' ? 'Сантехник' : 'Электрик'}
+        Специальность: {user?.role === 'PLUMBER' ? '🔧 Сантехник' : '⚡ Электрик'}
       </p>
 
       {tickets.length === 0 ? (
@@ -71,9 +69,22 @@ export default function WorkerTickets() {
                 <div>
                   <strong>Заявка #{ticket.id}</strong>
                   <p style={{ margin: '0.5rem 0', color: '#333' }}>{ticket.description}</p>
+                  
+                  {/* Адрес - выделен зеленым */}
+                  <p style={{ margin: '0.5rem 0', color: '#28a745', fontWeight: '600', fontSize: '1.05rem' }}>
+                    📍 {ticket.apartament_address || 'Адрес не указан'}
+                  </p>
+                  
+                  {/* Контакты заявителя */}
+                  <p style={{ margin: '0.5rem 0', color: '#17a2b8', fontWeight: '500' }}>
+                    📞 {ticket.user_phone || 'Телефон не указан'}
+                  </p>
+                  <p style={{ margin: '0.5rem 0', color: '#666' }}>
+                    👤 {ticket.user_name || 'Заявитель'}
+                  </p>
+                  
                   <small style={{ color: '#666' }}>
-                    {ticket.apartament_address || 'Адрес не указан'} • 
-                    {' '}{ticket.user_name || 'Житель'} • 
+                    {ticket.category === 'PLUMBING' ? '🔧 Сантехника' : '⚡ Электрика'} • 
                     {' '}{new Date(ticket.created_at).toLocaleString('ru-RU')}
                   </small>
                 </div>
@@ -83,13 +94,14 @@ export default function WorkerTickets() {
                   padding: '0.25rem 0.75rem',
                   borderRadius: '12px',
                   fontSize: '0.85rem',
+                  fontWeight: '600',
                 }}>
                   {ticket.status_display || ticket.status}
                 </span>
               </div>
 
               {/* Кнопки изменения статуса */}
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #eee' }}>
                 {ticket.status === 'NEW' && (
                   <button
                     onClick={() => updateStatus(ticket.id, 'IN_PROGRESS')}
@@ -100,9 +112,10 @@ export default function WorkerTickets() {
                       border: 'none',
                       borderRadius: '4px',
                       cursor: 'pointer',
+                      fontWeight: '600',
                     }}
                   >
-                    Взять в работу
+                    ✓ Взять в работу
                   </button>
                 )}
                 {ticket.status === 'IN_PROGRESS' && (
@@ -115,9 +128,10 @@ export default function WorkerTickets() {
                       border: 'none',
                       borderRadius: '4px',
                       cursor: 'pointer',
+                      fontWeight: '600',
                     }}
                   >
-                    Выполнено
+                    ✓ Выполнено
                   </button>
                 )}
               </div>

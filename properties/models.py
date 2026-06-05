@@ -42,11 +42,11 @@ class House(models.Model):
         ordering = ['city', 'street', 'building_number']
         unique_together = ['city', 'street', 'building_number']
 
-    def __set__(self):
+    def __str__(self):
         return f'{self.city}, {self.street}, {self.building_number}'
     def update_apartament_count(self):
-        self.total_apartaments = self.apatraments.count()
-        self.save(update_fields = ['total=apartaments'])
+        self.total_apartaments = self.apartaments.count()
+        self.save(update_fields = ['total_apartaments'])
 
 class Entrance(models.Model):
     house = models.ForeignKey(
@@ -65,14 +65,14 @@ class Entrance(models.Model):
          ordering = ['house', 'number']
          unique_together = ['house', 'number']
 
-    def __set__(self):
-        return f'{self.house}, - подъезд {self.entrance}'
+    def __str__(self):
+        return f'{self.house}, - подъезд {self.number}'
     
 class Apartament(models.Model):
 
     class ApartamentType(models.TextChoices):
         FLAT = 'FLAT', 'квартира'
-        ROOM = 'ROOM', 'команата'
+        ROOM = 'ROOM', 'комната'
         OFFICE = 'OFFICE', 'нежилое помещение'
 
     entrance = models.ForeignKey(

@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 from .serializers import RegisterSerializer, UserSerializer
 from .models import UserFCMToken
+from properties.models import Apartament
 from .serializers import FCMTokenSerializer
 
 User = get_user_model()
@@ -32,10 +33,7 @@ class CurrentUserView(APIView):
     
     
 class RegisterFCMTokenView(generics.CreateAPIView):
-    """
-    Регистрация FCM токена устройства для push-уведомлений.
-    POST /api/auth/register-device/
-    """
+
     serializer_class = FCMTokenSerializer
     permission_classes = (permissions.IsAuthenticated,)
     
@@ -46,13 +44,38 @@ class RegisterFCMTokenView(generics.CreateAPIView):
 
 
 class UnregisterFCMTokenView(generics.DestroyAPIView):
-    """
-    Удаление FCM токена (при выходе из приложения).
-    DELETE /api/auth/register-device/
-    """
+
     serializer_class = FCMTokenSerializer
     permission_classes = (permissions.IsAuthenticated,)
     
     def get_object(self):
         token = self.request.data.get('token')
         return UserFCMToken.objects.get(token=token, user=self.request.user)
+    
+
+class UserProfileView(APIView):
+
+    permission_classes = (permissions.IsAuthenticated,)
+    
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
+    
+    def patch(self, request):
+        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+
+class ApartamentsListView(generics.ListAPIView):
+
+    from properties.models import Apartament
+    from properties.serializers import ApartamentSerializer
+    
+    serializer_class = ApartamentSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    
+    def get_queryset(self):
+        # Можно добавить фильтрацию по дому пользователя
+        return Apartament.objects.select_related('entrance__house').all()

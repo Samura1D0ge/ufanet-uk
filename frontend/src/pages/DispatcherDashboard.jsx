@@ -8,15 +8,10 @@ export default function DispatcherDashboard() {
   const [filter, setFilter] = useState('ALL');
 
   useEffect(() => {
-    Promise.all([
-      client.get('/tickets/'),
-      client.get('/auth/me/'), // Получаем текущего пользователя (диспетчера)
-    ])
-      .then(([ticketsRes, userRes]) => {
-        setTickets(ticketsRes.data.results || ticketsRes.data);
-        // Загружаем всех работников (сантехников и электриков)
-        // В реальном приложении нужен отдельный endpoint для списка работников
-        return client.get('/auth/me/'); // Заглушка
+    client.get('/tickets/')
+      .then(({ data }) => {
+        setTickets(data.results || data);
+        setLoading(false);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -63,11 +58,12 @@ export default function DispatcherDashboard() {
               border: 'none',
               borderRadius: '4px',
               cursor: 'pointer',
+              fontWeight: filter === status ? '600' : '400',
             }}
           >
-            {status === 'ALL' ? 'Все' : 
-             status === 'NEW' ? 'Новые' : 
-             status === 'IN_PROGRESS' ? 'В работе' : 'Выполненные'}
+            {status === 'ALL' ? 'Все заявки' : 
+             status === 'NEW' ? '🆕 Новые' : 
+             status === 'IN_PROGRESS' ? '⚙️ В работе' : '✅ Выполненные'}
           </button>
         ))}
       </div>
@@ -83,12 +79,18 @@ export default function DispatcherDashboard() {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
               <div>
-                <strong>Заявка #{ticket.id}</strong>
+                <strong style={{ fontSize: '1.1rem' }}>Заявка #{ticket.id}</strong>
                 <p style={{ margin: '0.5rem 0', color: '#333' }}>{ticket.description}</p>
+                <p style={{ margin: '0.5rem 0', color: '#28a745', fontWeight: '500' }}>
+                  📍 {ticket.apartament_address || 'Адрес не указан'}
+                </p>
+                <p style={{ margin: '0.5rem 0', color: '#17a2b8' }}>
+                  📞 {ticket.user_phone || 'Телефон не указан'}
+                </p>
                 <small style={{ color: '#666' }}>
-                  {ticket.category === 'PLUMBING' ? 'Сантехника' : 'Электрика'} • 
-                  {' '}{ticket.apartament_address || 'Адрес не указан'} • 
-                  {' '}{ticket.user_name || 'Житель'}
+                  {ticket.category === 'PLUMBING' ? '🔧 Сантехника' : '⚡ Электрика'} • 
+                  {' '}{ticket.user_name || 'Житель'} •
+                  {' '}{new Date(ticket.created_at).toLocaleString('ru-RU')}
                 </small>
               </div>
               <span style={{
@@ -96,13 +98,22 @@ export default function DispatcherDashboard() {
                 color: 'white',
                 padding: '0.25rem 0.75rem',
                 borderRadius: '12px',
+                fontWeight: '600',
               }}>
                 {ticket.status_display || ticket.status}
               </span>
             </div>
 
-            {/* Назначение исполнителя */}
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #eee' }}>
+            {/* Управление */}
+            <div style={{ 
+              display: 'flex', 
+              gap: '1rem', 
+              alignItems: 'center', 
+              marginTop: '1rem', 
+              paddingTop: '1rem', 
+              borderTop: '1px solid #eee',
+              flexWrap: 'wrap',
+            }}>
               <label style={{ fontSize: '0.9rem', color: '#666' }}>
                 Назначить исполнителя:
               </label>
@@ -113,6 +124,7 @@ export default function DispatcherDashboard() {
                   padding: '0.5rem',
                   border: '1px solid #ddd',
                   borderRadius: '4px',
+                  minWidth: '200px',
                 }}
               >
                 <option value="">Не назначен</option>
