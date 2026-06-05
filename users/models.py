@@ -38,9 +38,6 @@ class CustomUserManager(BaseUserManager):
         return phone
 
 
-
-
-
 class User(AbstractUser):
 
     objects = CustomUserManager()
