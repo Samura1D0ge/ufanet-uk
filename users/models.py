@@ -45,7 +45,8 @@ class User(AbstractUser):
     class Role(models.TextChoices):
         RESIDENT = 'RESIDENT', 'Житель'
         DISPATCHER = 'DISPATCHER', 'Диспетчер'
-        WORKER = 'WORKER', 'Работник'
+        PLUMBER = 'PLUMBER', 'Сантехник'
+        ELECTRICAN = 'ELECTRICAN', 'Электрик'
         ADMIN = 'ADMIN', 'Админ'
 
     username = models.CharField(max_length=150, unique=True, blank=True, null=True)
@@ -88,7 +89,7 @@ class User(AbstractUser):
     
     @property
     def is_staff_member(self):
-        return self.role in (self.Role.DISPATCHER, self.Role.WORKER, self.Role.ADMIN)
+        return self.role in (self.Role.DISPATCHER, self.Role.PLUMBER, self.Role.ELECTRICAN, self.Role.ADMIN)
     
     USERNAME_FIELD = 'phone'
     REQUIRED_FIELDS = []

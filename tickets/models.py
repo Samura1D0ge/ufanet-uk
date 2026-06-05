@@ -18,9 +18,6 @@ class Ticket(models.Model):
     class Category(models.TextChoices):
         PLUMBING = 'PLUMBING', 'Сантехника'
         ELECTRICAL = 'ELECTRICAL', 'Электрика'
-        CLEANING = 'CLEANING', 'Уборка / Двор'
-        SECURITY = 'SECURITY', 'Безопасность'
-        OTHER = 'OTHER', 'Другое'
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -41,7 +38,6 @@ class Ticket(models.Model):
     category = models.CharField(
         max_length=20,
         choices=Category.choices,
-        default=Category.OTHER,
         verbose_name='Категория'
     )
     
