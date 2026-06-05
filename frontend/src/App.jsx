@@ -4,6 +4,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Tickets from './pages/Tickets';
 import CreateTicket from './pages/CreateTicket';
+import WorkerTickets from './pages/WorkerTickets';
+import DispatcherDashboard from './pages/DispatcherDashboard';
 
 // Защита роутов — если нет токена, редирект на логин
 function ProtectedRoute({ children }) {
@@ -23,6 +25,12 @@ export default function App() {
         } />
         <Route path="/create-ticket" element={
           <ProtectedRoute><CreateTicket /></ProtectedRoute>
+        } />
+        <Route path="/worker" element={
+          <ProtectedRoute><WorkerTickets /></ProtectedRoute>
+        } />
+        <Route path="/dispatcher" element={
+          <ProtectedRoute><DispatcherDashboard /></ProtectedRoute>
         } />
         <Route path="*" element={<Navigate to="/tickets" />} />
       </Routes>
