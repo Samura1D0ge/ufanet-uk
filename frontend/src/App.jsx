@@ -7,7 +7,6 @@ import CreateTicket from './pages/CreateTicket';
 import WorkerTickets from './pages/WorkerTickets';
 import DispatcherDashboard from './pages/DispatcherDashboard';
 
-// Защита роутов — если нет токена, редирект на логин
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('access_token');
   return token ? children : <Navigate to="/login" />;
@@ -32,7 +31,9 @@ export default function App() {
         <Route path="/dispatcher" element={
           <ProtectedRoute><DispatcherDashboard /></ProtectedRoute>
         } />
-        <Route path="*" element={<Navigate to="/tickets" />} />
+        {/* При переходе на главную — перенаправляем на логин */}
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   );

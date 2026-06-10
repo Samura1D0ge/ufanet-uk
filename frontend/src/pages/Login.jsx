@@ -12,13 +12,35 @@ export default function Login() {
     e.preventDefault();
     setError('');
     try {
+      // Сначала логинимся
       const { data } = await client.post('/auth/login/', { phone, password });
       localStorage.setItem('access_token', data.access);
       localStorage.setItem('refresh_token', data.refresh);
-      navigate('/tickets');
+      
+      // Получаем данные пользователя
+      const userRes = await client.get('/auth/me/');
+      const user = userRes.data;
+      
+      // Перенаправляем в зависимости от роли
+      if (user.role === 'DISPATCHER' || user.role === 'ADMIN') {
+        navigate('/dispatcher');
+      } else if (user.role === 'PLUMBER' || user.role === 'ELECTRICIAN') {
+        navigate('/worker');
+      } else {
+        navigate('/tickets');
+      }
     } catch (err) {
       setError('Неверный телефон или пароль');
     }
+  };
+
+  const inputStyle = {
+    width: '100%',
+    padding: '0.75rem',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    boxSizing: 'border-box',
+    marginBottom: '1rem',
   };
 
   return (
@@ -48,13 +70,7 @@ export default function Login() {
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+79991234567"
               required
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                boxSizing: 'border-box',
-              }}
+              style={inputStyle}
             />
           </div>
           <div style={{ marginBottom: '1.5rem' }}>
@@ -64,13 +80,7 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                boxSizing: 'border-box',
-              }}
+              style={inputStyle}
             />
           </div>
           <button type="submit" style={{

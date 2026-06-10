@@ -1,11 +1,8 @@
-from django.shortcuts import render
-
-# Create your views here.
-
 from rest_framework import viewsets, permissions
 from .models import Ticket
 from .serializers import TicketSerializer
 from .permissions import IsOwnerOrStaff
+
 
 class TicketViewSet(viewsets.ModelViewSet):
     serializer_class = TicketSerializer

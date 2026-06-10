@@ -5,7 +5,7 @@ from .models import House, Entrance, Apartament
 class HouseSerializer(serializers.ModelSerializer):
     class Meta:
         model = House
-        fields = ['id', 'address', 'city', 'street', 'building_number', 'total_floors']
+        fields = ['id', 'address', 'city', 'street', 'building_number']
 
 
 class EntranceSerializer(serializers.ModelSerializer):
@@ -23,7 +23,7 @@ class ApartamentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Apartament
         fields = [
-            'id', 'entrance', 'number', 'floor', 
+            'id', 'entrance', 'number', 'floor',
             'apartament_type', 'total_area', 'room_count',
             'account_number', 'full_address'
         ]

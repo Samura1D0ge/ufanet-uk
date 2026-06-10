@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import client from '../api/client';
 
@@ -7,9 +7,30 @@ export default function CreateTicket() {
     category: 'PLUMBING',
     description: '',
     priority: 'MEDIUM',
+    apartament: '',
   });
+  const [apartments, setApartments] = useState([]);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    Promise.all([
+      client.get('/auth/me/'),
+      client.get('/properties/apartments/'),
+    ])
+      .then(([profileRes, apartmentsRes]) => {
+        setApartments(apartmentsRes.data.results || apartmentsRes.data);
+        if (profileRes.data.apartament) {
+          setForm(prev => ({...prev, apartament: profileRes.data.apartament}));
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,6 +53,8 @@ export default function CreateTicket() {
     marginBottom: '1rem',
   };
 
+  if (loading) return <div style={{ padding: '2rem' }}>Загрузка...</div>;
+
   return (
     <div style={{ padding: '2rem', maxWidth: '600px', margin: '0 auto' }}>
       <h1>Новая заявка</h1>
@@ -42,20 +65,37 @@ export default function CreateTicket() {
         borderRadius: '8px',
         boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
       }}>
-        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Категория</label>
+        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+          Ваша квартира *
+        </label>
+        <select
+          value={form.apartament || ''}
+          onChange={(e) => setForm({...form, apartament: e.target.value})}
+          required
+          style={inputStyle}
+        >
+          <option value="">Выберите квартиру</option>
+          {apartments.map(apt => (
+            <option key={apt.id} value={apt.id}>
+              {apt.full_address || `Квартира ${apt.number}`}
+            </option>
+          ))}
+        </select>
+
+        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Категория</label>
         <select value={form.category} onChange={(e) => setForm({...form, category: e.target.value})} style={inputStyle}>
           <option value="PLUMBING">Сантехника</option>
           <option value="ELECTRICAL">Электрика</option>
         </select>
 
-        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Приоритет</label>
+        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Приоритет</label>
         <select value={form.priority} onChange={(e) => setForm({...form, priority: e.target.value})} style={inputStyle}>
           <option value="LOW">Низкий</option>
           <option value="MEDIUM">Средний</option>
           <option value="HIGH">Высокий</option>
         </select>
 
-        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Описание проблемы</label>
+        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Описание проблемы</label>
         <textarea
           value={form.description}
           onChange={(e) => setForm({...form, description: e.target.value})}

@@ -1,11 +1,8 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
-from django.conf import settings
 
-# Create your models here.
 
 class CustomUserManager(BaseUserManager):
-
     def create_user(self, phone, password=None, **extra_fields):
         if not phone:
             raise ValueError('Телефон обязателен')
@@ -15,9 +12,7 @@ class CustomUserManager(BaseUserManager):
         user = self.model(phone=phone, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
-
         return user
-    
 
     def create_superuser(self, phone, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
@@ -30,7 +25,7 @@ class CustomUserManager(BaseUserManager):
             raise ValueError('Суперпользователь должен иметь is_superuser=True.')
         
         return self.create_user(phone, password, **extra_fields)
-    
+
     @staticmethod
     def normalize_phone(phone):
         if phone:
@@ -39,41 +34,42 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-
     objects = CustomUserManager()
 
     class Role(models.TextChoices):
         RESIDENT = 'RESIDENT', 'Житель'
         DISPATCHER = 'DISPATCHER', 'Диспетчер'
         PLUMBER = 'PLUMBER', 'Сантехник'
-        ELECTRICAN = 'ELECTRICAN', 'Электрик'
+        ELECTRICIAN = 'ELECTRICIAN', 'Электрик'
         ADMIN = 'ADMIN', 'Админ'
 
     username = models.CharField(max_length=150, unique=True, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     phone = models.CharField(
-        max_length= 12,
+        max_length=20,  # ← ИСПРАВЛЕНО (было 12)
         unique=True,
         help_text='Номер для входа',
     )
     role = models.CharField(
         max_length=20,
         choices=Role.choices,
-        default= Role.RESIDENT,
-        db_index = True,
+        default=Role.RESIDENT,
+        db_index=True,
     )
     apartament = models.ForeignKey(
         'properties.Apartament',
-        on_delete= models.SET_NULL,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='residents',
+        related_name='residents',  # ← ИСПРАВЛЕНО (было resident)
     )
-
     is_verified = models.BooleanField(
         default=False,
-        help_text='Подтвердил ли жител что реально живет',
+        help_text='Подтвердил ли житель что реально живет',
     )
+
+    USERNAME_FIELD = 'phone'
+    REQUIRED_FIELDS = []
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -82,22 +78,25 @@ class User(AbstractUser):
 
     def __str__(self):
         return f'{self.get_full_name() or self.phone} ({self.get_role_display()})'
-    
+
     @property
     def is_resident(self):
         return self.role == self.Role.RESIDENT
-    
+
     @property
     def is_staff_member(self):
-        return self.role in (self.Role.DISPATCHER, self.Role.PLUMBER, self.Role.ELECTRICAN, self.Role.ADMIN)
-    
-    USERNAME_FIELD = 'phone'
-    REQUIRED_FIELDS = []
+        return self.role in (  # ← ИСПРАВЛЕНО (было set.role)
+            self.Role.DISPATCHER,
+            self.Role.PLUMBER,
+            self.Role.ELECTRICIAN,
+            self.Role.ADMIN
+        )
+
 
 class UserFCMToken(models.Model):
-
+    """FCM токен устройства пользователя для push-уведомлений."""
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        User,
         on_delete=models.CASCADE,
         related_name='fcm_tokens',
     )
@@ -121,7 +120,3 @@ class UserFCMToken(models.Model):
 
     def __str__(self):
         return f'Токен для {self.user.phone} ({self.device_type})'
-
-
-
-

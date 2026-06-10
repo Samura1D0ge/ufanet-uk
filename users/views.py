@@ -68,7 +68,7 @@ class UserProfileView(APIView):
         return Response(serializer.data)
 
 
-class ApartamentsListView(generics.ListAPIView):
+class ApartmentsListView(generics.ListAPIView):
 
     from properties.models import Apartament
     from properties.serializers import ApartamentSerializer
@@ -79,3 +79,13 @@ class ApartamentsListView(generics.ListAPIView):
     def get_queryset(self):
         # Можно добавить фильтрацию по дому пользователя
         return Apartament.objects.select_related('entrance__house').all()
+class WorkerListView(generics.ListAPIView):
+    """Список работников (сантехников и электриков) для назначения на заявки."""
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        # Возвращаем только сантехников и электриков
+        return User.objects.filter(
+            role__in=[User.Role.PLUMBER, User.Role.ELECTRICIAN]
+        ).select_related('apartament__entrance__house')
