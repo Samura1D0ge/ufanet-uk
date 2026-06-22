@@ -6,6 +6,9 @@ import Tickets from './pages/Tickets';
 import CreateTicket from './pages/CreateTicket';
 import WorkerTickets from './pages/WorkerTickets';
 import DispatcherDashboard from './pages/DispatcherDashboard';
+import News from './pages/News';
+import CreateNews from './pages/CreateNews';
+import PushNotifications from './components/PushNotifications';
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('access_token');
@@ -16,6 +19,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Navbar />
+      <PushNotifications />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -31,7 +35,12 @@ export default function App() {
         <Route path="/dispatcher" element={
           <ProtectedRoute><DispatcherDashboard /></ProtectedRoute>
         } />
-        {/* При переходе на главную — перенаправляем на логин */}
+        <Route path="/news" element={
+          <ProtectedRoute><News /></ProtectedRoute>
+        } />
+        <Route path="/create-news" element={
+          <ProtectedRoute><CreateNews /></ProtectedRoute>
+        } />
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>

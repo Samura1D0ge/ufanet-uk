@@ -15,19 +15,15 @@ export default function CreateTicket() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    Promise.all([
-      client.get('/auth/me/'),
-      client.get('/properties/apartments/'),
-    ])
-      .then(([profileRes, apartmentsRes]) => {
-        setApartments(apartmentsRes.data.results || apartmentsRes.data);
-        if (profileRes.data.apartament) {
-          setForm(prev => ({...prev, apartament: profileRes.data.apartament}));
-        }
+    client.get('/properties/apartments/')
+      .then((res) => {
+        const data = res.data.results || res.data;
+        setApartments(Array.isArray(data) ? data : []);
         setLoading(false);
       })
-      .catch(err => {
-        console.error(err);
+      .catch((err) => {
+        console.error('Ошибка загрузки квартир:', err);
+        setApartments([]);
         setLoading(false);
       });
   }, []);
@@ -53,7 +49,9 @@ export default function CreateTicket() {
     marginBottom: '1rem',
   };
 
-  if (loading) return <div style={{ padding: '2rem' }}>Загрузка...</div>;
+  if (loading) {
+    return <div style={{ padding: '2rem' }}>Загрузка...</div>;
+  }
 
   return (
     <div style={{ padding: '2rem', maxWidth: '600px', margin: '0 auto' }}>
@@ -75,7 +73,7 @@ export default function CreateTicket() {
           style={inputStyle}
         >
           <option value="">Выберите квартиру</option>
-          {apartments.map(apt => (
+          {apartments.map((apt) => (
             <option key={apt.id} value={apt.id}>
               {apt.full_address || `Квартира ${apt.number}`}
             </option>

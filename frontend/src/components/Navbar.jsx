@@ -39,6 +39,42 @@ export default function Navbar() {
       { to: '/dispatcher', label: 'Панель диспетчера' },
     ];
   }
+    if (user.role === 'RESIDENT') {
+    menuItems = [
+      { to: '/tickets', label: 'Мои заявки' },
+      { to: '/create-ticket', label: 'Создать заявку' },
+      { to: '/news', label: 'Новости' }, // ← ДОБАВЬ
+    ];
+  } else if (user.role === 'PLUMBER' || user.role === 'ELECTRICIAN') {
+    menuItems = [
+      { to: '/worker', label: 'Мои заявки' },
+      { to: '/news', label: 'Новости' }, // ← ДОБАВЬ
+    ];
+  } else if (user.role === 'DISPATCHER' || user.role === 'ADMIN') {
+    menuItems = [
+      { to: '/dispatcher', label: 'Панель диспетчера' },
+      { to: '/news', label: 'Новости' }, // ← ДОБАВЬ
+    ];
+  } 
+
+    if (user.role === 'RESIDENT') {
+    menuItems = [
+      { to: '/tickets', label: 'Мои заявки' },
+      { to: '/create-ticket', label: 'Создать заявку' },
+      { to: '/news', label: 'Новости' },
+    ];
+  } else if (user.role === 'PLUMBER' || user.role === 'ELECTRICIAN') {
+    menuItems = [
+      { to: '/worker', label: 'Мои заявки' },
+      { to: '/news', label: 'Новости' },
+    ];
+  } else if (user.role === 'DISPATCHER' || user.role === 'ADMIN') {
+    menuItems = [
+      { to: '/dispatcher', label: 'Панель диспетчера' },
+      { to: '/news', label: 'Новости' },
+      { to: '/create-news', label: '+ Создать новость' }, // ← ДОБАВЬ
+    ];
+  }
 
   return (
     <nav style={{
