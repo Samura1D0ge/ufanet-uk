@@ -4,6 +4,7 @@ from .serializers import TicketSerializer
 from .permissions import IsOwnerOrStaff
 import firebase_admin
 from firebase_admin import credentials, messaging
+from notifications.models import Notification
 from conf.firebase import send_push_notification
 
 class TicketViewSet(viewsets.ModelViewSet):

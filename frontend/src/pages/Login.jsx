@@ -23,11 +23,11 @@ export default function Login() {
       
       // Перенаправляем в зависимости от роли
       if (user.role === 'DISPATCHER' || user.role === 'ADMIN') {
-        navigate('/dispatcher');
+        window.location.href = '/dispatcher';
       } else if (user.role === 'PLUMBER' || user.role === 'ELECTRICIAN') {
-        navigate('/worker');
+        window.location.href = '/worker';
       } else {
-        navigate('/tickets');
+        window.location.href = '/tickets';
       }
     } catch (err) {
       setError('Неверный телефон или пароль');
