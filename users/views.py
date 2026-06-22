@@ -10,6 +10,8 @@ from .serializers import RegisterSerializer, UserSerializer
 from .models import UserFCMToken
 from properties.models import Apartament
 from .serializers import FCMTokenSerializer
+from rest_framework.authtoken.models import Token
+
 
 User = get_user_model()
 
@@ -89,3 +91,20 @@ class WorkerListView(generics.ListAPIView):
         return User.objects.filter(
             role__in=[User.Role.PLUMBER, User.Role.ELECTRICIAN]
         ).select_related('apartament__entrance__house')
+    
+
+class FCMTokenView(generics.GenericAPIView):
+    """Сохранение FCM токена пользователя."""
+    serializer_class = FCMTokenSerializer
+    
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        token = serializer.validated_data['token']
+        
+        # Сохраняем токен для текущего пользователя
+        request.user.fcm_token = token
+        request.user.save()
+        
+        return Response({'status': 'ok', 'message': 'FCM token saved'})

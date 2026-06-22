@@ -21,17 +21,15 @@ def get_firebase_app():
     return firebase_admin.get_app()
 
 
-def send_push_notification(token, title, body, data=None):
+def send_push_notification(fcm_token, title, body, data=None):
     """
-
     Args:
-        token: FCM токен устройства пользователя
+        fcm_token: FCM токен устройства пользователя
         title: Заголовок уведомления
         body: Текст уведомления
         data: Дополнительные данные (например, id заявки)
     """
-    app = get_firebase_app()
-    if not app:
+    if not fcm_token:
         return False
     
     try:
@@ -40,19 +38,14 @@ def send_push_notification(token, title, body, data=None):
                 title=title,
                 body=body,
             ),
-            data=data or {},
-            token=token,
-            android=messaging.AndroidConfig(
-                priority='high',
-            ),
+            token=fcm_token,
         )
         
         response = messaging.send(message)
-        print(f"✅ Push отправлен: {response}")
+        print(f'✅ Уведомление отправлено: {response}')
         return True
-        
     except Exception as e:
-        print(f"❌ Ошибка отправки push: {e}")
+        print(f'❌ Ошибка отправки уведомления: {e}')
         return False
 
 

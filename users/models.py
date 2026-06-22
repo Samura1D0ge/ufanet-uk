@@ -61,12 +61,13 @@ class User(AbstractUser):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='residents',  # ← ИСПРАВЛЕНО (было resident)
+        related_name='residents',
     )
     is_verified = models.BooleanField(
         default=False,
         help_text='Подтвердил ли житель что реально живет',
     )
+    fcm_token = models.CharField(max_length=255, blank=True, null=True)
 
     USERNAME_FIELD = 'phone'
     REQUIRED_FIELDS = []

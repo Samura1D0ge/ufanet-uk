@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from .models import UserFCMToken
+from .models import User
 
 User = get_user_model()
 
@@ -31,9 +32,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class FCMTokenSerializer(serializers.ModelSerializer):
+    token = serializers.CharField(max_length=255)
     class Meta:
         model = UserFCMToken
         fields = ('token', 'device_type')
+
 
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user

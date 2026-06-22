@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import RegisterView, CurrentUserView, RegisterFCMTokenView, UnregisterFCMTokenView, WorkerListView
+from .views import FCMTokenView
 
 from .views import (
     RegisterView, CurrentUserView, 
@@ -22,4 +23,5 @@ urlpatterns = [
     path('auth/register-device/', RegisterFCMTokenView.as_view(), name='register_device'),
     path('auth/unregister-device/', UnregisterFCMTokenView.as_view(), name='unregister_device'),
     path('auth/workers/', WorkerListView.as_view(), name='workers_list'),
+    path('auth/fcm-token/', FCMTokenView.as_view(), name='fcm_token'),
 ]
