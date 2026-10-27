@@ -1,7 +1,25 @@
-*.json
-!package.json
-db.sqlite3
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.sqlite3
+.venv/
 venv/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*-firebase-adminsdk-*.json
+
+# User-uploaded files
 media/
+
+# Frontend
+node_modules/
+dist/
+dist-ssr/
+
+# Local tooling
+.idea/
+.vscode/*
+!.vscode/extensions.json
